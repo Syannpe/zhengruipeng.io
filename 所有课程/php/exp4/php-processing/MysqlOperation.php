@@ -1,6 +1,6 @@
 <?php
 
-namespace php\exp4\php-processing;
+//namespace php\exp4\php-processing;
 
 trait MysqlOperation
 {
