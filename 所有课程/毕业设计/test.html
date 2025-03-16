@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        cus-a {
+            border: green solid 1px;
+            width: 100px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<!--<cus-a/>-->
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        const A = class extends HTMLElement {
+            stylesheet = {
+                color: "red",
+                height: "100px"
+            }
+
+            set style(stylesheet) {
+                console.log("调用set")
+                this.stylesheet = stylesheet;
+            }
+
+            get style() {
+                console.log("调用get")
+                return this.stylesheet;
+            }
+        }
+
+        customElements.define("cus-a", A);
+
+        let a = new A();
+        this.body.appendChild(a);
+        console.log(a, a.style)
+
+        let animationEffect = new KeyframeEffect(a, [
+            {color: "red", height: "100px"},
+            {color: "blue", height: "200px"}
+        ], {
+            duration: 2000,
+            fill: "backwards",
+        });
+
+        let documentTimeline = new DocumentTimeline();
+
+        let anime = new Animation(animationEffect, documentTimeline);
+        anime.play();
+        let render = function (t) {
+            console.log(anime.playState, getComputedStyle(a).height);
+
+            if (t < 2000) requestAnimationFrame(render)
+        };
+        render(0);
+
+    })
+</script>
+</body>
+</html>

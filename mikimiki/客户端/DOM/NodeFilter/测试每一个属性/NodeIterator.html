@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            color: blue;
+        }
+
+        p {
+            color: green;
+        }
+
+        ul {
+            list-style-type: square;
+        }
+
+        a {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Hello, World!</h1>
+    <p>This is a paragraph.</p>
+    <ul>
+        <li>List item 1</li>
+        <li>List item 2</li>
+        <li>List item 3</li>
+    </ul>
+    <a href="#">This is a link</a>
+    <div>
+        <span>This is a span inside a div.</span>
+    </div>
+    <script type="module">
+        import { JSONParser } from './JSONParser.min.js';
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const config = {
+                SHOW_ALL: false,
+                SHOW_ELEMENT: false,
+                SHOW_ATTRIBUTE: false,
+                SHOW_TEXT: false,
+                SHOW_CDATA_SECTION: false,
+                SHOW_ENTITY_REFERENCE: false,
+                SHOW_ENTITY: false,
+                SHOW_PROCESSING_INSTRUCTION: false,
+                SHOW_COMMENT: false,
+                SHOW_DOCUMENT: false,
+                SHOW_DOCUMENT_TYPE: false,
+                SHOW_DOCUMENT_FRAGMENT: false,
+                SHOW_NOTATION: false
+            };
+            let param = 0;
+            console.log((param | NodeFilter.SHOW_ALL >>> 1).toString(2));
+            const jsonParser = new JSONParser(config);
+            jsonParser.defaultInit();
+            jsonParser.onJsonChange = function (ev) {
+
+                console.log(param | NodeFilter.SHOW_ELEMENT);
+                //所有需要显示的节点类型的字符串
+                const whatToShow = Object.entries(jsonParser.toJSON()).reduce((str, [key, value]) => {
+                    if (value) {
+                        str += key + "|";
+                        param |= NodeFilter[key];
+                        console.log(param.toString(2), NodeFilter[key].toString(2));
+
+                    }
+
+                    return str;
+                }, "").slice(0, -1);
+
+                console.log(whatToShow, param);
+
+                //创建一个NodeIterator对象
+                const nodeIterator = document.createNodeIterator(document.body, NodeFilter.SHOW_ELEMENT, {
+                    acceptNode: function (node) {
+                        if (node.nodeName.match(new RegExp(whatToShow, "i"))) {
+                            return NodeFilter.FILTER_ACCEPT;
+                        } else {
+                            return NodeFilter.FILTER_REJECT;
+                        }
+                    }
+                });
+
+            };
+
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .button {
+            padding: 7px 14px;
+            font-family: 微软雅黑;
+            font-size: 13px;
+            border-radius: 3px;
+            transition: .3s;
+            color: #000;
+            backgruond-color: #ffffff;
+            cursor: pointer;
+
+        }
+
+        .button:hover {
+            box-shadow: #66ccff 0 0 20px;
+            background-color: rgba(100, 200, 255, .2);
+        }
+
+        #div {
+            padding: 10px 20px;
+            border: red solid 1px;
+        }
+
+        #div > div {
+            padding: 10px 20px;
+            margin: 10px;
+            border: red solid 1px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="button" id="character">insert character</div>
+<div class="button" id="stopObserve">stop observe</div>
+<div id="div">123
+</div>
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        // Select the node that will be observed for mutations
+        const character = document.getElementById('character');
+        const stopObserve = document.getElementById('stopObserve');
+        const targetNode = document.getElementById('div');
+
+// Options for the observer (which mutations to observe)
+        const config = {
+            characterData: true,
+            characterDataOldValue: true,
+        };
+
+        // Callback function to execute when mutations are observed
+        const callback = function (mutationsList, observer) {
+
+            // Use traditional 'for loops' for IE 11
+            for (const mutation of mutationsList) {
+                console.log(mutation, observer);
+                if (mutation.type === 'childList') {
+                    console.log('A child node has been added or removed.');
+                } else if (mutation.type === 'attributes') {
+                    console.log('The ' + mutation.attributeName + ' attribute was modified.');
+                } else if (mutation.type === "characterData") {
+                    console.log("character data was changed")
+                } else {
+                    console.log("unknown mutation type", mutation.type);
+                }
+            }
+        };
+
+        // Create an observer instance linked to the callback function
+        const observer = new MutationObserver(callback);
+
+        // Start observing the target node for configured mutations
+        //要注意：如果想监听内容变化的话需要监听这个内容的Text节点，这一点和监听其他的都不同。
+        console.log(targetNode.childNodes[0], targetNode.childNodes[0].constructor)
+        observer.observe(targetNode.childNodes[0], config);
+
+
+        stopObserve.onclick = function () {
+            // Later, you can stop observing
+            observer.disconnect();
+        }
+        character.onclick = function () {
+            targetNode.childNodes[0].data = "1";
+        };
+
+    });
+</script>
+</body>
+</html>

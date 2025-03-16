@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="list.css" rel="stylesheet" type="text/css" />
+    <style>
+        button{
+            padding:5px 14px;
+            background-color: #fff;
+            border-radius: 5px;
+            border:#639 solid 2px;
+            color:#639;
+            margin:auto;
+            transition: .3s;
+            cursor: pointer;
+        }
+        button:hover{
+            background-color: #639;
+            color:#fff;
+        }
+    </style>
+</head>
+<body>
+<button id="requestDevice">搜索</button>
+<button id="forgetDevice">忘记</button>
+
+<button id="gattServer">查看GATT服务器</button>
+<button id="connectgattServer">连接GATT服务器</button>
+<button id="disconnectgattServer">断开连接GATT服务器</button>
+<script type="module">
+
+</script>
+<script type="module">
+    import {listInstance} from "./create-list.js"
+
+    document.addEventListener("DOMContentLoaded",function (){
+
+
+        const requestDeviceBtn = this.querySelector("#requestDevice");
+        const forgetDeviceBtn = this.querySelector("#forgetDevice");
+
+        const gattServerBtn = this.querySelector("#gattServer");
+        const connectgattServerBtn = this.querySelector("#connectgattServer");
+        const disconnectgattServerBtn = this.querySelector("#disconnectgattServer");
+
+        console.log(navigator.bluetooth)
+
+
+        navigator.bluetooth.getDevices().then(bluetoothdevices => {
+            console.log(bluetoothdevices)
+
+            bluetoothdevices.forEach(bluetoothdevice => {
+                listInstance.createItem(bluetoothdevice.name);
+            })
+
+        });
+
+        requestDeviceBtn.onclick = function (){
+            let options = {
+                acceptAllDevices:true,
+            }
+
+            navigator.bluetooth.requestDevice(options).then((device) => {
+                console.log(device);
+                listInstance.createItem(device.name);
+            }).catch(console.log);
+
+
+        };
+        forgetDeviceBtn.onclick = function (){
+            const num = prompt("忘记第几个？")-0;
+            navigator.bluetooth.getDevices().then(async bluetoothdevice => {
+                bluetoothdevice[num].forget();
+
+                listInstance.removeItem(num);
+
+                console.log(await navigator.bluetooth.getDevices())
+
+            });
+
+
+        };
+        gattServerBtn.onclick = function (){
+            const num = prompt("查看第几个？")-0;
+            navigator.bluetooth.getDevices().then(async bluetoothdevice => {
+                console.log(bluetoothdevice[num].gatt);
+
+            });
+
+
+        };
+        connectgattServerBtn.onclick = function (){
+            const num = prompt("连接第几个？")-0;
+            navigator.bluetooth.getDevices().then(async bluetoothdevice => {
+                // console.log(bluetoothdevice[num].gatt);
+                bluetoothdevice[num].gatt.connect().then(bluetoothRemoteGATTService => console.log(bluetoothRemoteGATTService))
+            });
+
+
+        };
+        disconnectgattServerBtn.onclick = function (){
+            const num = prompt("断开第几个？")-0;
+            navigator.bluetooth.getDevices().then(async bluetoothdevice => {
+                // console.log(bluetoothdevice[num].gatt);
+                bluetoothdevice[num].gatt.disconnect()
+
+            });
+
+
+        };
+
+    })
+</script>
+</body>
+</html>

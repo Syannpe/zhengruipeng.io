@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Web OTP API Simplest</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>div {font-family: sans-serif;}</style>
+</head>
+<body>
+<div>
+  用一个设备发送一个以<pre><code>@zhengruipeng.github.io #12345</code></pre>结尾的短信，可自动获取验证码，
+  @后面固定的域名，没端口没协议，#后固定验证码首位以数字开头，4-10位
+</div>
+<div style="border:1px solid; padding: 5px 10px; margin: 10px 0;">
+  <form method="post" action="./ac.php">
+    Enter OTP here:
+    <input type="text" autocomplete="one-time-code" inputmode="numeric" name="one-time-code">
+    <input type="submit" value="Submit">
+  </form>
+</div>
+<pre><code>
+&lt;input type="text" autocomplete="one-time-code" inputmode="numeric" /&gt;
+&lt;script&gt;
+if ('OTPCredential' in window) {
+  window.addEventListener('DOMContentLoaded', e =&gt; {
+    const input = document.querySelector('input[autocomplete="one-time-code"]');
+    if (!input) return;
+    const ac = new AbortController();
+    const form = input.closest('form');
+    if (form) {
+      form.addEventListener('submit', e =&gt; {
+        ac.abort();
+      });
+    }
+    navigator.credentials.get({
+      otp: { transport:['sms'] },
+      signal: ac.signal
+    }).then(otp =&gt; {
+      input.value = otp.code;
+      if (form) form.submit();
+    }).catch(err =&gt; {
+      console.log(err);
+    });
+  });
+}
+&lt;/script&gt;
+    </code></pre>
+<div>
+  See the source code and play with it at <a href="https://glitch.com/edit/#!/web-otp">https://glitch.com/edit/#!/web-otp</a>
+</div>
+<div>
+  Learn more at <a href="http://web.dev/web-otp">http://web.dev/web-otp</a>.
+</div>
+<script>
+  if ('OTPCredential' in window) {
+    window.addEventListener('DOMContentLoaded', e => {
+      alert("get OTPCredential");
+      const input = document.querySelector('input[autocomplete="one-time-code"]');
+      if (!input) return;
+      const ac = new AbortController();
+      const form = input.closest('form');
+      if (form) {
+        form.addEventListener('submit', e => {
+          ac.abort();
+        });
+      }
+      navigator.credentials.get({
+        otp: { transport:['sms'] },
+        signal: ac.signal
+      }).then(otp => {
+        alert(otp.code);
+        input.value = otp.code;
+        if (form) form.submit();
+      }).catch(err => {
+        alert(err.message);
+      });
+    });
+  }
+</script>
+</body>
+</html>
